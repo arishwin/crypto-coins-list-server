@@ -1,5 +1,7 @@
 const NodeCache = require("node-cache");
 const axios = require("axios");
+const CoinGecko = require("coingecko-api");
+const CoinGeckoClient = new CoinGecko();
 
 const cache = new NodeCache();
 
@@ -10,12 +12,13 @@ function sleep(ms) {
 }
 
 async function loadCoins() {
-  const response = await axios.get(
-    "https://api.coingecko.com/api/v3/coins/list"
-  );
+  // const response = await axios.get(
+  //   "https://api.coingecko.com/api/v3/coins/list"
+  // );
+  const response = await CoinGeckoClient.coins.all();
   let coins = [];
   // fetch detail for each coin in coinsList
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < response.data.length; i++) {
     console.log("sleeping for 5 seconds");
     // sleep for 5 seconds to avoid exceeding the API limit
     await sleep(5000);
@@ -32,11 +35,16 @@ async function loadCoins() {
         symbol: coinDetail.data.symbol,
         image: coinDetail.data.image.large,
       });
-
       console.log(`${coinDetail.data.name} added to coins array`);
+      if (cache.getStats().vsize !== response.data.length * 40) {
+        console.log(cache.getStats());
+        console.log(response.data.length * 40);
+        console.log("adding coins to cache");
+        cache.set("coins", coins);
+      }
     }
+    cache.set("coins", coins);
   }
-  cache.set("coins", coins);
 }
 
 async function getAllCoins() {
