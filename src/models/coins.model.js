@@ -11,7 +11,7 @@ function sleep(ms) {
   });
 }
 
-async function loadCoins() {
+async function loadCoins(isCached) {
   // const response = await axios.get(
   //   "https://api.coingecko.com/api/v3/coins/list"
   // );
@@ -36,9 +36,7 @@ async function loadCoins() {
         image: coinDetail.data.image.large,
       });
       console.log(`${coinDetail.data.name} added to coins array`);
-      if (cache.getStats().vsize !== response.data.length * 40) {
-        console.log(cache.getStats());
-        console.log(response.data.length * 40);
+      if (!isCached) {
         console.log("adding coins to cache");
         cache.set("coins", coins);
       }

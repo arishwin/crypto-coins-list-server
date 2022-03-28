@@ -9,13 +9,13 @@ const PORT = process.env.PORT || 8000;
 const server = http.createServer(app);
 
 async function startServer() {
-  loadCoins().then(() => {
+  loadCoins(false).then(() => {
     console.log("Coins loaded");
   });
 
   cron.schedule("0 7 * * *", () => {
     console.log("Retrieving coins data");
-    loadCoins();
+    loadCoins(true);
   });
 
   server.listen(PORT, () => {
